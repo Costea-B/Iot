@@ -6,7 +6,7 @@
 #include "dd_filter_saltpepper/dd_filter_saltpepper.h"
 #include "dd_temp.h"
 
-#define DHTPIN 4
+#define DHTPIN 10
 #define DHTTYPE DHT11
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -28,18 +28,22 @@ void Temp_Init() {
 
 // Citirea temperaturii
 void Temp_Read(TempData *data) {
+    taskENTER_CRITICAL();
     float temp = dht.readTemperature();
+    taskEXIT_CRITICAL();
 
     if (isnan(temp)) {
         data->sensor_ok = false;
         data->temperature = 0;
-        Serial.println("Eroare la citirea senzorului DHT!");
+        //Serial.println("Eroare la citirea senzorului DHT!");
     } else {
         data->sensor_ok = true;
         data->temperature = temp;
-        Serial.print("Temperature: "); Serial.print(temp);
+        Serial.print("Temperatura: ");
+        Serial.println(temp);
     }
 }
+
 
 // Task FreeRTOS
 void Temp_Task(void *pvParameters) {

@@ -2,13 +2,13 @@
 #define DD_LED_H
 
 #include <Arduino.h>
+#include <stdbool.h>
 
-#define LED1_PIN 2
-#define LED2_PIN 3
+#define RELAY_PIN  13   // pinul care controlează releul/LED-ul
 
 void Led_Init(void);
-void Led1_Set(bool state);
-void Led1_Toggle(void);
-void Led2_Set(bool state);
+void Led_Set(bool state);
+void Led_Toggle(void);
+bool Led_GetState(void);
 
 #endif

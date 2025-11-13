@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <stdbool.h>
 
-#define RELAY_CONTROL_PIN  7      // pinul Arduino conectat la + releu
+#define RELAY_CONTROL_PIN  6      // pinul Arduino conectat la + releu
 
 void Relay_Init(void);
 void Relay_On(void);

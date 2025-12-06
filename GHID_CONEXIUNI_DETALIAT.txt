@@ -1,0 +1,395 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║          GHID DETALIAT PAS CU PAS - CONEXIUNI HARDWARE LAB 7.1                ║
+║                  Pentru începători - Explicații complete                      ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 1: PREGĂTIREA BREADBOARD-ULUI ȘI POZIȚIONAREA COMPONENTELOR
+═══════════════════════════════════════════════════════════════════════════════
+
+1.1 AȘEZAREA PE MASĂ:
+   • Pune breadboard-ul în față ta, orizontal
+   • Arduino Mega SLAVE (cel cu senzor) - în stânga breadboard-ului
+   • Arduino Mega MASTER (cel de afișare) - în dreapta breadboard-ului
+   • Ambele Arduino-uri NU se conectează direct pe breadboard (sunt prea mari)
+   • Folosim fire jumper pentru a conecta de la Arduino la breadboard
+
+1.2 IDENTIFICAREA RAIL-URILOR BREADBOARD:
+   Breadboard-ul are două zone principale:
+   
+   [+] Rail POZITIV (RED) - linie roșie continuă pe margine
+   [-] Rail NEGATIV (BLUE/BLACK) - linie albastră/neagră pe margine
+   
+   Zona centrală - găuri conectate pe verticală (coloane a-e și f-j)
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 2: CONECTAREA ALIMENTĂRII (FOARTE IMPORTANT!)
+═══════════════════════════════════════════════════════════════════════════════
+
+2.1 CONECTARE GND COMUN (OBLIGATORIU!):
+   
+   Fir 1: Arduino SLAVE GND → Rail negativ breadboard [-]
+          ├─ De la: Oricare pin GND de pe Arduino Mega SLAVE
+          └─ La: Rail negativ breadboard (linia albastră/neagră)
+   
+   Fir 2: Arduino MASTER GND → Rail negativ breadboard [-]
+          ├─ De la: Oricare pin GND de pe Arduino Mega MASTER
+          └─ La: ACELAȘI rail negativ breadboard (linia albastră/neagră)
+   
+   ⚠️ ATENȚIE: Ambele Arduino-uri TREBUIE să aibă GND comun!
+              Fără GND comun, comunicația I²C NU VA FUNCȚIONA!
+
+2.2 CONECTARE 5V (pentru senzor și pull-up):
+   
+   Fir 3: Arduino SLAVE 5V → Rail pozitiv breadboard [+]
+          ├─ De la: Pin 5V de pe Arduino Mega SLAVE
+          └─ La: Rail pozitiv breadboard (linia roșie)
+   
+   ℹ️ De ce doar de la SLAVE? 
+      Senzorul este conectat la SLAVE, deci luăm alimentare de acolo.
+      MASTER nu are nevoie de alimentare separată pe breadboard.
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 3: CONECTAREA SENZORULUI HC-SR04
+═══════════════════════════════════════════════════════════════════════════════
+
+3.1 IDENTIFICAREA PINILOR HC-SR04:
+    Pe senzorul HC-SR04 vei vedea 4 pini marcați:
+    
+    [VCC] [TRIG] [ECHO] [GND]
+      ↑     ↑      ↑      ↑
+      1     2      3      4
+
+3.2 POZIȚIONAREA HC-SR04 PE BREADBOARD:
+    • Pune senzorul pe breadboard astfel încât cei 4 pini să intre în găuri
+    • Exemplu: Punei în rândul 10, coloanele e-f-g-h
+    • Asigură-te că "ochii" senzorului (emițător/receptor) sunt îndreptați spre exterior
+
+3.3 CONEXIUNI HC-SR04:
+
+    Fir 4: HC-SR04 VCC → Rail pozitiv [+]
+           ├─ De la: Pinul VCC al senzorului (primul pin, stânga)
+           └─ La: Rail pozitiv breadboard [+]
+           │
+           └─ EXPLICAȚIE: VCC = alimentare +5V pentru senzor
+
+    Fir 5: HC-SR04 GND → Rail negativ [-]
+           ├─ De la: Pinul GND al senzorului (ultimul pin, dreapta)
+           └─ La: Rail negativ breadboard [-]
+           │
+           └─ EXPLICAȚIE: GND = masă comună pentru senzor
+
+    Fir 6: HC-SR04 TRIG → Arduino SLAVE Pin 8
+           ├─ De la: Pinul TRIG al senzorului (al doilea pin)
+           └─ La: Pin digital 8 de pe Arduino Mega SLAVE
+           │
+           └─ EXPLICAȚIE: TRIG = pin de trigger, Arduino trimite puls pe acest pin
+
+    Fir 7: HC-SR04 ECHO → Arduino SLAVE Pin 9
+           ├─ De la: Pinul ECHO al senzorului (al treilea pin)
+           └─ La: Pin digital 9 de pe Arduino Mega SLAVE
+           │
+           └─ EXPLICAȚIE: ECHO = pin de răspuns, Arduino primește puls pe acest pin
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 4: CONEXIUNEA I²C ÎNTRE MASTER ȘI SLAVE (FĂRĂ REZISTENȚE ÎNCĂ)
+═══════════════════════════════════════════════════════════════════════════════
+
+4.1 CE ESTE I²C?
+    I²C = protocol de comunicație cu 2 fire:
+    • SDA (Serial Data) = transferă date
+    • SCL (Serial Clock) = sincronizare
+    
+    Pe Arduino Mega 2560:
+    • SDA = Pin 20
+    • SCL = Pin 21
+
+4.2 CONEXIUNI I²C DIRECTE:
+
+    Fir 8: Arduino MASTER Pin 20 (SDA) → Arduino SLAVE Pin 20 (SDA)
+           ├─ De la: Pin 20 de pe Arduino Mega MASTER
+           └─ La: Pin 20 de pe Arduino Mega SLAVE
+           │
+           └─ EXPLICAȚIE: Linia SDA conectează cele două plăci pentru transfer date
+
+    Fir 9: Arduino MASTER Pin 21 (SCL) → Arduino SLAVE Pin 21 (SCL)
+           ├─ De la: Pin 21 de pe Arduino Mega MASTER
+           └─ La: Pin 21 de pe Arduino Mega SLAVE
+           │
+           └─ EXPLICAȚIE: Linia SCL conectează cele două plăci pentru sincronizare
+
+    ⚠️ IMPORTANT: Aceste două fire pot fi conectate direct sau prin breadboard
+                 (nu contează, important e să fie conectate)
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 5: MONTAREA REZISTENȚELOR PULL-UP (OPȚIONAL DAR RECOMANDAT)
+═══════════════════════════════════════════════════════════════════════════════
+
+5.1 DE CE SUNT NECESARE REZISTENȚELE PULL-UP?
+
+    I²C este un protocol "open-drain":
+    • Când nu se transmit date, liniile SDA și SCL "plutesc" (nu sunt la 0V sau 5V)
+    • Rezistențele pull-up "trag" liniile la 5V când nu se folosesc
+    • Aceasta asigură comunicație stabilă și fără erori
+    
+    FĂRĂ rezistențe pull-up:
+    ✗ Comunicație instabilă
+    ✗ Erori de checksum
+    ✗ Poate funcționa sau nu (depinde de distanță și fire)
+    
+    CU rezistențe pull-up:
+    ✓ Comunicație stabilă
+    ✓ Date valide
+    ✓ Funcționează întotdeauna corect
+
+5.2 CE REZISTENȚE FOLOSIM?
+
+    Valoare: 4.7 kΩ (kilohmi)
+    Culori pe rezistență: Galben-Violet-Roșu-Auriu
+    
+    Dacă nu ai 4.7kΩ, poți folosi:
+    • 4.7kΩ (ideal)
+    • 10kΩ (funcționează bine)
+    • 2.2kΩ - 10kΩ (orice în acest interval)
+
+5.3 MONTAREA REZISTENȚEI PENTRU SDA:
+
+    Rezistență 1 (4.7kΩ):
+    
+    Un capăt → Linia SDA (Pin 20)
+    ├─ Pune un capăt al rezistenței în aceeași coloană de pe breadboard
+    │  unde ai conectat un fir la Pin 20 (SDA)
+    │
+    Celălalt capăt → Rail pozitiv [+] (5V)
+    └─ Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
+    
+    EXPLICAȚIE:
+    Rezistența "leagă" linia SDA de +5V prin rezistență.
+    Când nu se transmit date, SDA este tras la 5V.
+    Când se transmit date, Arduino poate trage linia la 0V.
+
+5.4 MONTAREA REZISTENȚEI PENTRU SCL:
+
+    Rezistență 2 (4.7kΩ):
+    
+    Un capăt → Linia SCL (Pin 21)
+    ├─ Pune un capăt al rezistenței în aceeași coloană de pe breadboard
+    │  unde ai conectat un fir la Pin 21 (SCL)
+    │
+    Celălalt capăt → Rail pozitiv [+] (5V)
+    └─ Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
+    
+    EXPLICAȚIE: La fel ca pentru SDA, dar pentru linia SCL.
+
+5.5 VARIANTE DE MONTARE A REZISTENȚELOR:
+
+    VARIANTA A (Recomandat - prin breadboard):
+    
+    1. Conectează Pin 20 (SDA) Master la o coloană pe breadboard (ex: coloana 15e)
+    2. Conectează Pin 20 (SDA) Slave la ACEEAȘI coloană (ex: coloana 15f)
+    3. Pune un capăt al rezistenței tot în această coloană (ex: 15g)
+    4. Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
+    
+    Repetă același lucru pentru SCL (Pin 21).
+    
+    VARIANTA B (Simplu - direct pe pini):
+    
+    Dacă nu vrei să folosești breadboard pentru I²C:
+    
+    1. Conectează direct Master Pin 20 → Slave Pin 20 (fir direct)
+    2. Pe breadboard, într-o coloană liberă:
+       - Pune un fir la Pin 20 (oricare dintre ele)
+       - Pune un capăt de rezistență în aceeași coloană
+       - Pune celălalt capăt în rail [+]
+    
+    Repetă pentru Pin 21.
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 6: VERIFICARE FINALĂ A CONEXIUNILOR
+═══════════════════════════════════════════════════════════════════════════════
+
+6.1 CHECKLIST CONEXIUNI:
+
+    ☐ Arduino SLAVE GND → Rail negativ breadboard [-]
+    ☐ Arduino MASTER GND → Rail negativ breadboard [-] (ACELAȘI rail!)
+    ☐ Arduino SLAVE 5V → Rail pozitiv breadboard [+]
+    
+    ☐ HC-SR04 VCC → Rail pozitiv [+]
+    ☐ HC-SR04 GND → Rail negativ [-]
+    ☐ HC-SR04 TRIG → Arduino SLAVE Pin 8
+    ☐ HC-SR04 ECHO → Arduino SLAVE Pin 9
+    
+    ☐ Arduino MASTER Pin 20 (SDA) → Arduino SLAVE Pin 20 (SDA)
+    ☐ Arduino MASTER Pin 21 (SCL) → Arduino SLAVE Pin 21 (SCL)
+    
+    ☐ Rezistență 4.7kΩ între SDA și 5V (rail +)
+    ☐ Rezistență 4.7kΩ între SCL și 5V (rail +)
+
+6.2 VERIFICARE CU MULTIMETRU (OPȚIONAL):
+
+    Dacă ai multimetru, verifică:
+    
+    1. Continuitate între GND MASTER și GND SLAVE (trebuie să arate 0Ω)
+    2. Tensiune între rail [+] și rail [-] = 5V
+    3. NU trebuie să existe continuitate între [+] și [-] (scurtcircuit!)
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 7: SCHEMA VIZUALĂ SIMPLIFICATĂ
+═══════════════════════════════════════════════════════════════════════════════
+
+Vista de sus a breadboard-ului:
+
+    RAIL [+] ═══════════════════════════════════════════════════════
+              ║                                                    ║
+              ║         (HC-SR04)                                  ║
+              ║    VCC TRIG ECHO GND                               ║
+              ║     │   │    │    │                                ║
+    RAIL [-] ═╬═════╪═══╪════╪════╪════════════════════════════════
+              ║     │   │    │    │                                ║
+              ║     │   │    │    └─────────────┐                  ║
+              ║     │   │    │                  │                  ║
+              ║     │   │    └─────────┐        │                  ║
+              ║     │   │              │        │                  ║
+              ║     │   └──────┐       │        │                  ║
+              ║     │          │       │        │                  ║
+              ║     └───┐      │       │        │                  ║
+              ║         │      │       │        │                  ║
+    ──────────╬─────────┼──────┼───────┼────────┼──────────────────
+              ║         │      │       │        │
+              ║         │      │       │        │
+    Arduino SLAVE:      │      │       │        │
+      5V ───────────────┘      │       │        │
+      Pin 8 ───────────────────┘       │        │
+      Pin 9 ───────────────────────────┘        │
+      GND ───────────────────────────────────────┘
+      Pin 20 (SDA) ─────────┬───────────────────────────── Pin 20 (SDA) Arduino MASTER
+                            │                  ┌────────── Pin 21 (SCL) Arduino MASTER
+      Pin 21 (SCL) ─────────┼──────────────────┤
+                            │                  │
+                         [4.7kΩ]            [4.7kΩ]
+                            │                  │
+                            └──────┬───────────┘
+                                   │
+    RAIL [+] ═════════════════════╪══════════════════════════
+                                   │
+    Arduino MASTER:                │
+      GND ─────────────────────────┴────────────────────────→ RAIL [-]
+
+═══════════════════════════════════════════════════════════════════════════════
+  PASUL 8: LISTA COMPLETĂ DE FIRE NECESARE
+═══════════════════════════════════════════════════════════════════════════════
+
+Fire Male-Male (M-M) - pentru conexiuni Arduino → Arduino sau Arduino → breadboard:
+
+    Fir 1:  Arduino SLAVE GND → Breadboard rail [-]        (NEGRU/MARO)
+    Fir 2:  Arduino MASTER GND → Breadboard rail [-]       (NEGRU/MARO)
+    Fir 3:  Arduino SLAVE 5V → Breadboard rail [+]         (ROȘU)
+    Fir 4:  Breadboard rail [+] → HC-SR04 VCC              (ROȘU)
+    Fir 5:  Breadboard rail [-] → HC-SR04 GND              (NEGRU)
+    Fir 6:  Arduino SLAVE Pin 8 → HC-SR04 TRIG             (GALBEN/PORTOCALIU)
+    Fir 7:  Arduino SLAVE Pin 9 → HC-SR04 ECHO             (VERDE/ALBASTRU)
+    Fir 8:  Arduino MASTER Pin 20 → Arduino SLAVE Pin 20   (ALBASTRU)
+    Fir 9:  Arduino MASTER Pin 21 → Arduino SLAVE Pin 21   (VERDE)
+
+Total: 9 fire jumper Male-Male
+
+Rezistențe:
+    2x Rezistențe 4.7kΩ (Galben-Violet-Roșu-Auriu)
+
+═══════════════════════════════════════════════════════════════════════════════
+  ÎNTREBĂRI FRECVENTE (FAQ)
+═══════════════════════════════════════════════════════════════════════════════
+
+Q: Pot funcționa fără rezistențele pull-up?
+A: DA, dar comunicația poate fi instabilă. Pe distanțe scurte (fire < 20cm) 
+   Arduino Mega are deja rezistențe pull-up interne slabe care pot funcționa.
+   Dacă ai probleme (erori checksum), ADAUGĂ rezistențele!
+
+Q: Ce se întâmplă dacă inversez SDA cu SCL?
+A: Comunicația NU va funcționa deloc. Pin 20 trebuie conectat la Pin 20,
+   și Pin 21 la Pin 21.
+
+Q: Pot folosi alte pini pentru I²C?
+A: NU pe Arduino Mega! I²C hardware folosește doar Pin 20 (SDA) și Pin 21 (SCL).
+   Nu pot fi schimbați!
+
+Q: De ce GND-ul trebuie să fie comun?
+A: Pentru ca semnalele digitale să fie interpretate corect, ambele Arduino-uri
+   trebuie să aibă același "punct de referință" pentru tensiuni. GND comun
+   este acest punct de referință.
+
+Q: Pot alimenta ambele Arduino-uri de la același USB?
+A: NU! Fiecare Arduino trebuie alimentat separat (fiecare cu USB propriu).
+   Însă GND-urile TREBUIE conectate împreună pe breadboard!
+
+Q: HC-SR04 poate fi pus direct pe pini Arduino?
+A: NU! HC-SR04 are 4 pini în linie și nu se potrivește direct pe Arduino.
+   Trebuie să folosești fire jumper pentru a-l conecta.
+
+Q: Ce lungime pot avea firele I²C?
+A: Cu rezistențe pull-up:
+   • < 1 metru: funcționează perfect
+   • 1-2 metri: poate funcționa
+   • > 2 metri: probleme garantate
+   
+   Recomandare: Fire cât mai scurte posibil (10-30 cm ideal)
+
+═══════════════════════════════════════════════════════════════════════════════
+  ERORI COMUNE ȘI SOLUȚII
+═══════════════════════════════════════════════════════════════════════════════
+
+❌ EROARE: "Master nu primește date"
+   ✓ SOLUȚIE:
+     1. Verifică că GND-ul este comun
+     2. Verifică că ambele Arduino-uri sunt alimentate (USB conectat)
+     3. Verifică că SLAVE-ul este programat corect (vezi Serial Monitor SLAVE)
+     4. Adaugă rezistențe pull-up
+
+❌ EROARE: "Checksum invalid"
+   ✓ SOLUȚIE:
+     1. Adaugă rezistențe pull-up dacă nu sunt montate
+     2. Folosește fire mai scurte
+     3. Verifică calitatea conexiunilor (fire bine înfipte)
+
+❌ EROARE: "Senzor returnează 9999"
+   ✓ SOLUȚIE:
+     1. Verifică alimentarea HC-SR04 (VCC la 5V, GND la GND)
+     2. Verifică conexiunile TRIG (Pin 8) și ECHO (Pin 9)
+     3. Pune un obiect în fața senzorului (> 2cm distanță)
+
+❌ EROARE: "Nu apare nimic în Serial Monitor"
+   ✓ SOLUȚIE:
+     1. Verifică că baudrate-ul este setat la 9600
+     2. Verifică că Arduino-ul corect este conectat la USB
+     3. Resetează Arduino-ul (buton RESET)
+
+═══════════════════════════════════════════════════════════════════════════════
+  SECVENȚA DE PORNIRE CORECTĂ
+═══════════════════════════════════════════════════════════════════════════════
+
+După ce ai conectat tot hardware-ul:
+
+1. Programează SLAVE:
+   • Conectează doar Arduino SLAVE la PC
+   • Upload cod: platformio.exe run -e slave -t upload
+   • Verifică Serial Monitor SLAVE (9600 baud)
+   • Trebuie să vezi: "SLAVE: Distanta citita: XX cm"
+
+2. Deconectează SLAVE, programează MASTER:
+   • Deconectează Arduino SLAVE de la PC
+   • Conectează doar Arduino MASTER la PC
+   • Upload cod: platformio.exe run -e master -t upload
+   • NU deschide încă Serial Monitor
+
+3. Pornire sistem complet:
+   • Conectează ambele Arduino-uri la USB (alimentare)
+   • Deschide Serial Monitor pentru MASTER (9600 baud)
+   • Trebuie să vezi: "MASTER: Pachet I2C valid primit"
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Succes la montarea circuitului! 🎯
+
+Dacă ai întrebări sau probleme, verifică din nou acest ghid pas cu pas!
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,248 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                  LAB 7.1: COMUNICAȚIE I²C CU SENZOR ULTRASONIC                 ║
+║                      SCHEMĂ DE CONEXIUNI HARDWARE                              ║
+║                     2x Arduino Mega 2560 + HC-SR04                             ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  COMPONENTE NECESARE                                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+  • 2x Arduino Mega 2560 (Master și Slave)
+  • 1x Senzor ultrasonic HC-SR04
+  • 2x Rezistențe pull-up 4.7kΩ (pentru SDA și SCL)
+  • 1x Breadboard mare (sau 2 breadboard-uri mici)
+  • Fire jumper (M-M, M-F)
+  • 2x Cabluri USB pentru alimentare și programare
+  • Alimentare comună (GND comun între cele două plăci)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ARDUINO MEGA SLAVE - Conexiuni                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┬──────────────────────────────────────────────────────┐
+│ Pin Slave           │ Conectare                                            │
+├─────────────────────┼──────────────────────────────────────────────────────┤
+│ Pin 8               │ HC-SR04 TRIG (Trigger)                               │
+│ Pin 9               │ HC-SR04 ECHO (Echo)                                  │
+│ Pin 20 (SDA)        │ SDA Master (Pin 20) + Rezistență 4.7kΩ la 5V       │
+│ Pin 21 (SCL)        │ SCL Master (Pin 21) + Rezistență 4.7kΩ la 5V       │
+│ 5V                  │ HC-SR04 VCC + Rail pozitiv breadboard               │
+│ GND                 │ HC-SR04 GND + GND Master + Rail negativ breadboard  │
+└─────────────────────┴──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ARDUINO MEGA MASTER - Conexiuni                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┬──────────────────────────────────────────────────────┐
+│ Pin Master          │ Conectare                                            │
+├─────────────────────┼──────────────────────────────────────────────────────┤
+│ Pin 20 (SDA)        │ SDA Slave (Pin 20) + Rezistență 4.7kΩ la 5V        │
+│ Pin 21 (SCL)        │ SCL Slave (Pin 21) + Rezistență 4.7kΩ la 5V        │
+│ 5V                  │ Rail pozitiv breadboard (opțional pentru pull-up)   │
+│ GND                 │ GND Slave + Rail negativ breadboard (OBLIGATORIU!)  │
+└─────────────────────┴──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SENZOR HC-SR04 - Conexiuni                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┬──────────────────────────────────────────────────────┐
+│ Pin HC-SR04         │ Conectare                                            │
+├─────────────────────┼──────────────────────────────────────────────────────┤
+│ VCC                 │ 5V Slave                                             │
+│ TRIG                │ Pin 8 Slave                                          │
+│ ECHO                │ Pin 9 Slave                                          │
+│ GND                 │ GND Slave                                            │
+└─────────────────────┴──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  MAGISTRALA I²C - Detalii conexiuni                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Master (Pin 20) ─────┬───── Slave (Pin 20)  [SDA]
+                         │
+                      4.7kΩ (pull-up)
+                         │
+                        5V
+
+    Master (Pin 21) ─────┬───── Slave (Pin 21)  [SCL]
+                         │
+                      4.7kΩ (pull-up)
+                         │
+                        5V
+
+    Master GND ────────────────── Slave GND     [GND COMUN OBLIGATORIU!]
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SCHEMA LOGICĂ DE CONEXIUNE                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────┐                    ┌──────────────────────┐
+    │   ARDUINO MEGA       │        I²C         │   ARDUINO MEGA       │
+    │      MASTER          │◄──────────────────►│      SLAVE           │
+    │                      │   SDA (Pin 20)     │                      │
+    │  - Interogare I²C    │   SCL (Pin 21)     │  - FreeRTOS Tasks    │
+    │  - Afișare Serial    │   GND comun        │  - Citire HC-SR04    │
+    │  - Validare date     │                    │  - Buffer I²C        │
+    └──────────────────────┘                    └──────────┬───────────┘
+                                                           │
+                                                           │ GPIO
+                                                           ▼
+                                                  ┌─────────────────┐
+                                                  │   HC-SR04       │
+                                                  │  Senzor         │
+                                                  │  Ultrasonic     │
+                                                  │                 │
+                                                  │ TRIG: Pin 8     │
+                                                  │ ECHO: Pin 9     │
+                                                  └─────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PAȘI DE ASAMBLARE PE BREADBOARD                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+PASUL 1: Pregătirea breadboard-ului
+  • Conectează rail-ul pozitiv (+) la 5V de pe Slave
+  • Conectează rail-ul negativ (−) la GND de pe ambele Arduino-uri (GND comun!)
+
+PASUL 2: Montarea senzorului HC-SR04
+  • Plasează HC-SR04 pe breadboard
+  • Conectează VCC la rail pozitiv (+)
+  • Conectează GND la rail negativ (−)
+  • Conectează TRIG la Pin 8 Slave cu fir jumper
+  • Conectează ECHO la Pin 9 Slave cu fir jumper
+
+PASUL 3: Conexiunea I²C între Master și Slave
+  • Conectează Pin 20 (SDA) Master → Pin 20 (SDA) Slave
+  • Conectează Pin 21 (SCL) Master → Pin 21 (SCL) Slave
+  • Conectează GND Master → GND Slave (CRUCIAL pentru I²C!)
+
+PASUL 4: Montarea rezistențelor pull-up
+  • Plasează o rezistență 4.7kΩ între SDA și 5V (rail pozitiv)
+  • Plasează o rezistență 4.7kΩ între SCL și 5V (rail pozitiv)
+  • Acestea stabilizează semnalele I²C
+
+PASUL 5: Verificare conexiuni
+  • Verifică continuitatea cu multimetru (opțional)
+  • Asigură-te că NU există scurtcircuite între 5V și GND
+  • Verifică că toate pinii sunt conectați corect
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PROGRAMAREA CELOR DOUĂ PLĂCI                                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+PROGRAMAREA SLAVE:
+  1. Conectează Arduino Mega SLAVE la PC prin USB
+  2. În PlatformIO, deschide fișierul: src/slave_main.cpp
+  3. Modifică platformio.ini pentru a seta sursa la slave_main.cpp:
+     
+     [env:megaatmega2560_slave]
+     platform = atmelavr
+     board = megaatmega2560
+     framework = arduino
+     lib_deps =
+       feilipu/FreeRTOS@^10.4.6-1
+     build_src_filter = +<slave_main.cpp> -<*.cpp> +<dd_*/>
+  
+  4. Upload codul pe Slave
+  5. Deschide Serial Monitor la 9600 baud pentru monitorizare
+
+PROGRAMAREA MASTER:
+  1. Deconectează SLAVE de la PC
+  2. Conectează Arduino Mega MASTER la PC prin USB
+  3. În PlatformIO, modifică platformio.ini pentru master:
+     
+     [env:megaatmega2560_master]
+     platform = atmelavr
+     board = megaatmega2560
+     framework = arduino
+     build_src_filter = +<master_main.cpp> -<*.cpp> +<dd_*/>
+  
+  4. Upload codul pe Master
+  5. Deschide Serial Monitor la 9600 baud pentru monitorizare
+
+IMPORTANT: Dacă nu vrei să schimbi platformio.ini de fiecare dată:
+  • Redenumește main.cpp în main_old.cpp
+  • Copiază slave_main.cpp sau master_main.cpp în main.cpp după caz
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  TESTAREA SISTEMULUI                                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+1. După programare, conectează ambele Arduino-uri la USB pentru alimentare
+2. Deschide Serial Monitor pentru MASTER (9600 baud)
+3. Ar trebui să vezi mesaje cu date primite de la slave:
+   
+   MASTER: Pachet I2C valid primit
+     Header:   0xAA
+     Length:   2
+     Distance: 25 cm
+     Checksum: 0x8F [OK]
+   ========================================
+
+4. Mișcă un obiect în fața senzorului HC-SR04 pentru a vedea valori diferite
+5. Dacă obiectul este mai aproape de 10 cm, vei vedea alertă de proximitate
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  DEPANARE (TROUBLESHOOTING)                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+PROBLEMĂ: Master nu primește date
+  ✓ Verifică că GND-ul este comun între Master și Slave
+  ✓ Verifică conexiunile SDA (Pin 20) și SCL (Pin 21)
+  ✓ Verifică că rezistențele pull-up sunt montate corect
+  ✓ Verifică că Slave-ul este alimentat și programat corect
+
+PROBLEMĂ: Checksum invalid
+  ✓ Verifică calitatea conexiunilor I²C (fire scurte, bine conectate)
+  ✓ Adaugă condensatori de decuplare (0.1µF) între 5V și GND
+
+PROBLEMĂ: Senzor HC-SR04 returnează 9999
+  ✓ Verifică conexiunile TRIG (Pin 8) și ECHO (Pin 9)
+  ✓ Verifică alimentarea senzorului (5V și GND)
+  ✓ Asigură-te că nu există obstacole la mai puțin de 2 cm
+
+PROBLEMĂ: Erori de compilare FreeRTOS
+  ✓ Asigură-te că ai instalat biblioteca: feilipu/FreeRTOS@^10.4.6-1
+  ✓ Verifică că platformio.ini include biblioteca în lib_deps
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  COMPORTAMENT ADIȚIONAL IMPLEMENTAT (Pentru 10% bonus)                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+✓ Alertă de proximitate: Când distanța < 10 cm, se afișează mesaj de alertă
+✓ Detectare eroare senzor: Când distanța = 9999, se afișează mesaj de eroare
+✓ Validare checksum: Toate pachetele sunt verificate pentru integritate
+✓ FreeRTOS cu priorități: Task-ul de achiziție are prioritate mai mare
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  REZUMAT PINI FOLOSIȚI                                                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+ARDUINO MEGA SLAVE:
+  • Pin 8  → HC-SR04 TRIG
+  • Pin 9  → HC-SR04 ECHO
+  • Pin 20 → I²C SDA (la Master Pin 20)
+  • Pin 21 → I²C SCL (la Master Pin 21)
+  • 5V     → Alimentare HC-SR04 + Pull-up
+  • GND    → GND comun (Slave + Master + HC-SR04)
+
+ARDUINO MEGA MASTER:
+  • Pin 20 → I²C SDA (la Slave Pin 20)
+  • Pin 21 → I²C SCL (la Slave Pin 21)
+  • GND    → GND comun (Master + Slave)
+
+REZISTENȚE PULL-UP:
+  • 4.7kΩ între SDA și 5V
+  • 4.7kΩ între SCL și 5V
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                            NOTĂ IMPORTANTĂ                                     ║
+║                                                                                ║
+║  GND-ul comun între Master și Slave este OBLIGATORIU pentru comunicația I²C!  ║
+║  Fără GND comun, comunicația nu va funcționa!                                 ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+Creat pentru Lab 7.1 - Comunicații I²C cu FreeRTOS
+Arduino Mega 2560 Master + Slave + HC-SR04

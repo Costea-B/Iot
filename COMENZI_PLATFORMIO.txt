@@ -1,0 +1,343 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    COMENZI PLATFORMIO - LAB 7.1 I²C                           ║
+║                    Toate comenzile necesare pentru proiect                    ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+  1. COMPILARE (BUILD) - Verifică dacă codul se compilează fără erori
+═══════════════════════════════════════════════════════════════════════════════
+
+Compilare SLAVE (Arduino Mega 2560):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega   │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează codul pentru SLAVE fără să-l încarce pe placă
+Când: Pentru a verifica erorile înainte de upload
+
+
+Compilare MASTER (Arduino Uno):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e master_uno   │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează codul pentru MASTER fără să-l încarce pe placă
+Când: Pentru a verifica erorile înainte de upload
+
+
+Compilare TOATE environment-urile:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează toate environment-urile (slave_mega, master_uno, etc.)
+Când: Pentru verificare rapidă a întregului proiect
+
+═══════════════════════════════════════════════════════════════════════════════
+  2. UPLOAD - Încarcă codul pe placă
+═══════════════════════════════════════════════════════════════════════════════
+
+Upload pe SLAVE (Arduino Mega 2560):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -t upload --upload-port COM13 │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează și încarcă codul pe Arduino Mega 2560 pe portul COM13
+Când: Când vrei să programezi placa SLAVE cu senzorul HC-SR04
+Notă: Schimbă COM13 cu portul corect dacă este diferit
+
+
+Upload pe MASTER (Arduino Uno):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e master_uno -t upload --upload-port COM14 │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează și încarcă codul pe Arduino Uno pe portul COM14
+Când: Când vrei să programezi placa MASTER pentru interogare I²C
+Notă: Schimbă COM14 cu portul corect dacă este diferit
+
+═══════════════════════════════════════════════════════════════════════════════
+  3. MONITOR SERIAL - Vizualizare date în timp real
+═══════════════════════════════════════════════════════════════════════════════
+
+Deschide Serial Monitor (baudrate 9600):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Deschide monitor serial pentru a vedea mesajele de la Arduino
+Când: Pentru a vizualiza:
+      - Datele de la SLAVE (distanța măsurată de HC-SR04)
+      - Datele de la MASTER (pachete I²C primite)
+Notă: Baudrate TREBUIE să fie 9600 (setat în cod)
+Închidere: Apasă Ctrl+C pentru a ieși
+
+
+Deschide Serial Monitor cu baudrate diferit (opțional):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 115200 │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Monitor serial cu baudrate 115200
+Când: Dacă ai alt cod care folosește baudrate diferit
+Notă: Pentru acest laborator folosește DOAR 9600!
+
+═══════════════════════════════════════════════════════════════════════════════
+  4. VERIFICARE DISPOZITIVE - Vezi ce plăci sunt conectate
+═══════════════════════════════════════════════════════════════════════════════
+
+Listează toate porturile seriale:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device list         │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Afișează toate porturile COM disponibile
+Când: Când vrei să vezi pe ce port este conectat Arduino
+      Exemplu output: COM13 (USB-SERIAL CH340)
+
+═══════════════════════════════════════════════════════════════════════════════
+  5. CURĂȚARE PROIECT - Șterge fișierele compilate
+═══════════════════════════════════════════════════════════════════════════════
+
+Curăță toate build-urile:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -t clean        │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Șterge toate fișierele compilate (.o, .elf, .hex)
+Când: Când ai erori ciudate sau vrei să recompilezi totul de la zero
+
+
+Curăță build pentru environment specific:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -t clean │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Șterge doar fișierele compilate pentru slave_mega
+Când: Când vrei să recompilezi doar SLAVE-ul
+
+═══════════════════════════════════════════════════════════════════════════════
+  6. COMENZI COMBINATE - Upload + Monitor
+═══════════════════════════════════════════════════════════════════════════════
+
+Upload pe SLAVE + Monitor (COM14):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -t upload --upload-port COM14 -t monitor │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Încarcă codul pe SLAVE (COM14) și deschide imediat Serial Monitor
+Când: Pentru verificare rapidă după programare
+Notă: Apasă Ctrl+C pentru a ieși din monitor
+
+
+Upload pe MASTER + Monitor (COM13):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e master_uno -t upload --upload-port COM13 -t monitor │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Încarcă codul pe MASTER (COM13) și deschide imediat Serial Monitor
+Când: Pentru verificare rapidă după programare
+
+═══════════════════════════════════════════════════════════════════════════════
+  7. MONITORIZARE SIMULTANĂ - Ambele plăci deodată
+═══════════════════════════════════════════════════════════════════════════════
+
+Pentru a vedea SIMULTAN monitorul serial de la MASTER și SLAVE:
+
+
+METODA 1: Două terminale în VS Code (RECOMANDAT)
+─────────────────────────────────────────────────
+1. Deschide un terminal în VS Code
+2. Apasă butonul "+" (sau butonul split) pentru al doilea terminal
+3. În Terminal 1 (stânga) rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM13
+   (Monitorul MASTER-ului)
+
+4. În Terminal 2 (dreapta) rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM14
+   (Monitorul SLAVE-ului)
+
+5. Acum vezi ambele monitoare simultan!
+   Închidere: Ctrl+C în fiecare terminal
+
+
+METODA 2: PowerShell + VS Code Terminal
+────────────────────────────────────────
+1. Deschide o fereastră PowerShell separată (din Windows Start)
+2. În PowerShell rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM14
+   (SLAVE)
+
+3. În VS Code Terminal rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM13
+   (MASTER)
+
+
+METODA 3: Arduino IDE Serial Monitor + VS Code
+───────────────────────────────────────────────
+1. Deschide Arduino IDE
+2. Tools → Port → COM14 (SLAVE)
+3. Tools → Serial Monitor (sau Ctrl+Shift+M)
+4. În VS Code Terminal rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM13
+   (MASTER)
+
+
+IMPORTANT: 
+- NU poți deschide același port de 2 ori!
+- Fiecare monitor trebuie pe port diferit (COM13 vs COM14)
+- Baudrate TREBUIE să fie 9600 pentru ambele
+
+═══════════════════════════════════════════════════════════════════════════════
+  8. INFORMAȚII DESPRE PROIECT
+═══════════════════════════════════════════════════════════════════════════════
+
+Afișează informații despre environment-uri:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe project config      │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Afișează toate environment-urile configurate în platformio.ini
+Când: Pentru a vedea ce plăci/configurații ai disponibile
+
+
+Informații despre librării instalate:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe lib list            │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Listează toate librăriile instalate în proiect
+Când: Pentru a verifica ce librării sunt disponibile (FreeRTOS, Wire, etc.)
+
+═══════════════════════════════════════════════════════════════════════════════
+  9. INSTALARE/ACTUALIZARE LIBRĂRII
+═══════════════════════════════════════════════════════════════════════════════
+
+Instalează toate librăriile din platformio.ini:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe lib install         │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Instalează toate librăriile necesare (FreeRTOS, Wire, etc.)
+Când: Prima dată când deschizi proiectul sau când lipsesc librării
+
+
+Instalează librărie specifică:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe lib install "feilipu/FreeRTOS@^10.4.6-1" │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Instalează o librărie anume (exemplu: FreeRTOS)
+Când: Când ai nevoie de o librărie specifică
+
+═══════════════════════════════════════════════════════════════════════════════
+  10. VERIFICARE ERORI - Debug
+═══════════════════════════════════════════════════════════════════════════════
+
+Compilare cu output verbose (detaliat):
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -v │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Compilează cu mesaje detaliate despre fiecare pas
+Când: Când ai erori și vrei să vezi exact ce se întâmplă
+
+
+Upload cu output verbose:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -t upload -v │
+└─────────────────────────────────────────────────────────────────────────────┘
+Ce face: Upload cu detalii complete despre procesul de programare
+Când: Când upload-ul eșuează și vrei să vezi de ce
+
+═══════════════════════════════════════════════════════════════════════════════
+  11. SECVENȚA COMPLETĂ DE PROGRAMARE - LAB 7.1
+═══════════════════════════════════════════════════════════════════════════════
+
+PASUL 1: Identifică porturile COM
+──────────────────────────────────
+1. Conectează AMBELE plăci la USB (Mega + Uno)
+2. Rulează:
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device list
+
+3. Notează porturile (exemplu: COM13 și COM14)
+4. Identifică care placă este pe care port:
+   - Deconectează Mega → portul dispărut = Mega
+   - Reconectează Mega
+
+
+PASUL 2: Programează SLAVE (Arduino Mega 2560) pe COM14
+─────────────────────────────────────────────────────────
+1. Rulează (upload + monitor automat):
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e slave_mega -t upload --upload-port COM14 -t monitor
+
+2. Verifică că vezi: "SLAVE: Distanta citita: XX cm"
+3. Apasă Ctrl+C pentru a ieși din monitor
+
+
+PASUL 3: Programează MASTER (Arduino Uno) pe COM13
+───────────────────────────────────────────────────
+1. Rulează (upload + monitor automat):
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe run -e master_uno -t upload --upload-port COM13 -t monitor
+
+2. Ar trebui să vezi:
+   ========================================
+   MASTER: Pachet I2C valid primit
+     Header:   0xAA
+     Distance: 25 cm
+     Checksum: 0x8F [OK]
+   ========================================
+
+3. Lasă monitorul deschis sau Ctrl+C pentru a ieși
+
+
+PASUL 4: Monitorizare SIMULTANĂ (opțional)
+───────────────────────────────────────────
+1. Ambele plăci trebuie conectate la USB
+2. Asigură-te că toate firele I²C sunt conectate (SDA, SCL, GND comun)
+3. Deschide 2 terminale în VS Code (butonul "+" sau split)
+4. Terminal 1: Monitor MASTER (COM13)
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM13
+
+5. Terminal 2: Monitor SLAVE (COM14)
+   C:\Users\jorab\.platformio\penv\Scripts\platformio.exe device monitor -b 9600 -p COM14
+
+6. Acum vezi ambele monitoare simultan! 🎯
+
+═══════════════════════════════════════════════════════════════════════════════
+  COMENZI SCURTE (Alias-uri)
+═══════════════════════════════════════════════════════════════════════════════
+
+Poți crea alias-uri în PowerShell pentru comenzi mai scurte:
+
+Set-Alias pio "C:\Users\jorab\.platformio\penv\Scripts\platformio.exe"
+
+După aceasta poți folosi:
+
+pio run -e slave_mega -t upload       # Upload SLAVE
+pio run -e master_uno -t upload       # Upload MASTER
+pio device monitor -b 9600             # Monitor serial
+pio device list                        # Lista porturi
+
+═══════════════════════════════════════════════════════════════════════════════
+  ERORI COMUNE ȘI SOLUȚII
+═══════════════════════════════════════════════════════════════════════════════
+
+EROARE: "could not open port 'COMX': PermissionError"
+SOLUȚIE: Închide Serial Monitor sau orice alt program care folosește portul
+
+EROARE: "timeout communicating with programmer"
+SOLUȚIE: 
+  1. Verifică că placa corectă este conectată
+  2. Apasă butonul RESET pe Arduino înainte de upload
+  3. Încearcă un alt cablu USB
+
+EROARE: "No such file or directory: 'platformio'"
+SOLUȚIE: Folosește calea completă:
+  C:\Users\jorab\.platformio\penv\Scripts\platformio.exe
+
+EROARE: Compilare eșuează cu multe erori
+SOLUȚIE: 
+  1. Curăță proiectul: pio run -t clean
+  2. Recompilează: pio run
+
+EROARE: Upload merge la COM14 în loc de COM13 (când ambele plăci conectate)
+SOLUȚIE: Specifică portul manual cu --upload-port:
+  pio run -e slave_mega -t upload --upload-port COM13
+  pio run -e master_uno -t upload --upload-port COM14
+
+EROARE: Nu știu care placă este pe care port
+SOLUȚIE:
+  1. Rulează: pio device list
+  2. Deconectează o placă → portul dispărut = acea placă
+  3. Reconectează placa
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Creat pentru Lab 7.1 - Comunicații I²C cu FreeRTOS
+Arduino Mega 2560 (SLAVE) + Arduino Uno (MASTER)
+
+═══════════════════════════════════════════════════════════════════════════════

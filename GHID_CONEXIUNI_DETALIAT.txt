@@ -3,15 +3,37 @@
 ║                  Pentru începători - Explicații complete                      ║
 ╚════════════════════════════════════════════════════════════════════════════════╝
 
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ⚠️  CONFIGURAȚIA TA SPECIFICĂ - CITEȘTE CU ATENȚIE!                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Ai DOUĂ PLĂCI DIFERITE:
+
+  📟 SLAVE:  Arduino Mega 2560 (ATmega2560)
+     • Pini I²C: Pin 20 (SDA), Pin 21 (SCL)
+     • Cu senzor HC-SR04
+     • Cu FreeRTOS
+     • Programare: platformio.exe run -e slave_mega -t upload
+
+  📟 MASTER: Arduino Uno (ATmega328P)
+     • Pini I²C: Pin A4 (SDA), Pin A5 (SCL)  ⚠️ DIFERIȚI!
+     • Interogare I²C și afișare Serial
+     • Programare: platformio.exe run -e master_uno -t upload
+
+🔴 ATENȚIE CRITICĂ: Pinii I²C sunt DIFERIȚI pe cele două plăci!
+   • Mega 2560: Pin 20 (SDA) și Pin 21 (SCL)
+   • Uno:       Pin A4 (SDA) și Pin A5 (SCL)
+
 ═══════════════════════════════════════════════════════════════════════════════
   PASUL 1: PREGĂTIREA BREADBOARD-ULUI ȘI POZIȚIONAREA COMPONENTELOR
 ═══════════════════════════════════════════════════════════════════════════════
 
 1.1 AȘEZAREA PE MASĂ:
    • Pune breadboard-ul în față ta, orizontal
-   • Arduino Mega SLAVE (cel cu senzor) - în stânga breadboard-ului
-   • Arduino Mega MASTER (cel de afișare) - în dreapta breadboard-ului
-   • Ambele Arduino-uri NU se conectează direct pe breadboard (sunt prea mari)
+   • Arduino Mega 2560 SLAVE (cel cu senzor) - în stânga breadboard-ului
+   • Arduino Uno MASTER (cel de afișare, ATmega328P) - în dreapta breadboard-ului
+   • Mega 2560 NU se conectează direct pe breadboard (prea mare)
+   • Arduino Uno poate fi pus pe breadboard SAU lângă el
    • Folosim fire jumper pentru a conecta de la Arduino la breadboard
 
 1.2 IDENTIFICAREA RAIL-URILOR BREADBOARD:
@@ -33,7 +55,7 @@
           └─ La: Rail negativ breadboard (linia albastră/neagră)
    
    Fir 2: Arduino MASTER GND → Rail negativ breadboard [-]
-          ├─ De la: Oricare pin GND de pe Arduino Mega MASTER
+          ├─ De la: Oricare pin GND de pe Arduino Uno MASTER
           └─ La: ACELAȘI rail negativ breadboard (linia albastră/neagră)
    
    ⚠️ ATENȚIE: Ambele Arduino-uri TREBUIE să aibă GND comun!
@@ -100,21 +122,27 @@
     • SDA (Serial Data) = transferă date
     • SCL (Serial Clock) = sincronizare
     
-    Pe Arduino Mega 2560:
+    ⚠️ ATENȚIE - PINI DIFERIȚI PE CELE DOUĂ PLĂCI:
+    
+    Pe Arduino Mega 2560 (SLAVE):
     • SDA = Pin 20
     • SCL = Pin 21
+    
+    Pe Arduino Uno (MASTER):
+    • SDA = Pin A4
+    • SCL = Pin A5
 
 4.2 CONEXIUNI I²C DIRECTE:
 
-    Fir 8: Arduino MASTER Pin 20 (SDA) → Arduino SLAVE Pin 20 (SDA)
-           ├─ De la: Pin 20 de pe Arduino Mega MASTER
-           └─ La: Pin 20 de pe Arduino Mega SLAVE
+    Fir 8: Arduino MASTER Pin A4 (SDA) → Arduino SLAVE Pin 20 (SDA)
+           ├─ De la: Pin A4 de pe Arduino Uno MASTER
+           └─ La: Pin 20 de pe Arduino Mega 2560 SLAVE
            │
            └─ EXPLICAȚIE: Linia SDA conectează cele două plăci pentru transfer date
 
-    Fir 9: Arduino MASTER Pin 21 (SCL) → Arduino SLAVE Pin 21 (SCL)
-           ├─ De la: Pin 21 de pe Arduino Mega MASTER
-           └─ La: Pin 21 de pe Arduino Mega SLAVE
+    Fir 9: Arduino MASTER Pin A5 (SCL) → Arduino SLAVE Pin 21 (SCL)
+           ├─ De la: Pin A5 de pe Arduino Uno MASTER
+           └─ La: Pin 21 de pe Arduino Mega 2560 SLAVE
            │
            └─ EXPLICAȚIE: Linia SCL conectează cele două plăci pentru sincronizare
 
@@ -156,9 +184,9 @@
 
     Rezistență 1 (4.7kΩ):
     
-    Un capăt → Linia SDA (Pin 20)
+    Un capăt → Linia SDA (conectată la ambele plăci)
     ├─ Pune un capăt al rezistenței în aceeași coloană de pe breadboard
-    │  unde ai conectat un fir la Pin 20 (SDA)
+    │  unde ai conectat firele SDA (Pin A4 Uno + Pin 20 Mega)
     │
     Celălalt capăt → Rail pozitiv [+] (5V)
     └─ Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
@@ -172,9 +200,9 @@
 
     Rezistență 2 (4.7kΩ):
     
-    Un capăt → Linia SCL (Pin 21)
+    Un capăt → Linia SCL (conectată la ambele plăci)
     ├─ Pune un capăt al rezistenței în aceeași coloană de pe breadboard
-    │  unde ai conectat un fir la Pin 21 (SCL)
+    │  unde ai conectat firele SCL (Pin A5 Uno + Pin 21 Mega)
     │
     Celălalt capăt → Rail pozitiv [+] (5V)
     └─ Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
@@ -185,24 +213,26 @@
 
     VARIANTA A (Recomandat - prin breadboard):
     
-    1. Conectează Pin 20 (SDA) Master la o coloană pe breadboard (ex: coloana 15e)
-    2. Conectează Pin 20 (SDA) Slave la ACEEAȘI coloană (ex: coloana 15f)
+    1. Conectează Pin A4 (SDA) de pe Uno la o coloană pe breadboard (ex: coloana 15e)
+    2. Conectează Pin 20 (SDA) de pe Mega la ACEEAȘI coloană (ex: coloana 15f)
     3. Pune un capăt al rezistenței tot în această coloană (ex: 15g)
     4. Pune celălalt capăt al rezistenței în rail-ul pozitiv [+]
     
-    Repetă același lucru pentru SCL (Pin 21).
+    Repetă același lucru pentru SCL:
+    - Pin A5 (Uno) + Pin 21 (Mega) + rezistență la aceeași coloană
     
     VARIANTA B (Simplu - direct pe pini):
     
     Dacă nu vrei să folosești breadboard pentru I²C:
     
-    1. Conectează direct Master Pin 20 → Slave Pin 20 (fir direct)
-    2. Pe breadboard, într-o coloană liberă:
-       - Pune un fir la Pin 20 (oricare dintre ele)
+    1. Conectează direct Master Pin A4 → Slave Pin 20 (fir direct)
+    2. Conectează direct Master Pin A5 → Slave Pin 21 (fir direct)
+    3. Pe breadboard, într-o coloană liberă:
+       - Pune un fir la Pin A4 sau Pin 20 (oricare)
        - Pune un capăt de rezistență în aceeași coloană
        - Pune celălalt capăt în rail [+]
     
-    Repetă pentru Pin 21.
+    Repetă pentru SCL (Pin A5/Pin 21).
 
 ═══════════════════════════════════════════════════════════════════════════════
   PASUL 6: VERIFICARE FINALĂ A CONEXIUNILOR
@@ -219,8 +249,8 @@
     ☐ HC-SR04 TRIG → Arduino SLAVE Pin 8
     ☐ HC-SR04 ECHO → Arduino SLAVE Pin 9
     
-    ☐ Arduino MASTER Pin 20 (SDA) → Arduino SLAVE Pin 20 (SDA)
-    ☐ Arduino MASTER Pin 21 (SCL) → Arduino SLAVE Pin 21 (SCL)
+    ☐ Arduino Uno Pin A4 (SDA) → Arduino Mega Pin 20 (SDA)
+    ☐ Arduino Uno Pin A5 (SCL) → Arduino Mega Pin 21 (SCL)
     
     ☐ Rezistență 4.7kΩ între SDA și 5V (rail +)
     ☐ Rezistență 4.7kΩ între SCL și 5V (rail +)
@@ -262,8 +292,8 @@ Vista de sus a breadboard-ului:
       Pin 8 ───────────────────┘       │        │
       Pin 9 ───────────────────────────┘        │
       GND ───────────────────────────────────────┘
-      Pin 20 (SDA) ─────────┬───────────────────────────── Pin 20 (SDA) Arduino MASTER
-                            │                  ┌────────── Pin 21 (SCL) Arduino MASTER
+      Pin 20 (SDA) ─────────┬───────────────────────────── Pin A4 (SDA) Arduino Uno MASTER
+                            │                  ┌────────── Pin A5 (SCL) Arduino Uno MASTER
       Pin 21 (SCL) ─────────┼──────────────────┤
                             │                  │
                          [4.7kΩ]            [4.7kΩ]
@@ -288,8 +318,8 @@ Fire Male-Male (M-M) - pentru conexiuni Arduino → Arduino sau Arduino → brea
     Fir 5:  Breadboard rail [-] → HC-SR04 GND              (NEGRU)
     Fir 6:  Arduino SLAVE Pin 8 → HC-SR04 TRIG             (GALBEN/PORTOCALIU)
     Fir 7:  Arduino SLAVE Pin 9 → HC-SR04 ECHO             (VERDE/ALBASTRU)
-    Fir 8:  Arduino MASTER Pin 20 → Arduino SLAVE Pin 20   (ALBASTRU)
-    Fir 9:  Arduino MASTER Pin 21 → Arduino SLAVE Pin 21   (VERDE)
+    Fir 8:  Arduino Uno Pin A4 (SDA) → Arduino Mega Pin 20 (SDA)   (ALBASTRU)
+    Fir 9:  Arduino Uno Pin A5 (SCL) → Arduino Mega Pin 21 (SCL)   (VERDE)
 
 Total: 9 fire jumper Male-Male
 
@@ -310,8 +340,10 @@ A: Comunicația NU va funcționa deloc. Pin 20 trebuie conectat la Pin 20,
    și Pin 21 la Pin 21.
 
 Q: Pot folosi alte pini pentru I²C?
-A: NU pe Arduino Mega! I²C hardware folosește doar Pin 20 (SDA) și Pin 21 (SCL).
-   Nu pot fi schimbați!
+A: NU! I²C hardware folosește pini specifici:
+   • Arduino Mega 2560: Pin 20 (SDA) și Pin 21 (SCL)
+   • Arduino Uno: Pin A4 (SDA) și Pin A5 (SCL)
+   Acești pini sunt hardcoded și NU pot fi schimbați!
 
 Q: De ce GND-ul trebuie să fie comun?
 A: Pentru ca semnalele digitale să fie interpretate corect, ambele Arduino-uri
@@ -369,22 +401,61 @@ A: Cu rezistențe pull-up:
 
 După ce ai conectat tot hardware-ul:
 
-1. Programează SLAVE:
-   • Conectează doar Arduino SLAVE la PC
-   • Upload cod: platformio.exe run -e slave -t upload
+1. Programează SLAVE (Arduino Mega 2560):
+   • Conectează doar Arduino Mega 2560 la PC
+   • Upload cod: platformio.exe run -e slave_mega -t upload
    • Verifică Serial Monitor SLAVE (9600 baud)
    • Trebuie să vezi: "SLAVE: Distanta citita: XX cm"
 
-2. Deconectează SLAVE, programează MASTER:
-   • Deconectează Arduino SLAVE de la PC
-   • Conectează doar Arduino MASTER la PC
-   • Upload cod: platformio.exe run -e master -t upload
+2. Deconectează SLAVE, programează MASTER (Arduino Uno):
+   • Deconectează Arduino Mega de la PC
+   • Conectează doar Arduino Uno la PC
+   • Upload cod: platformio.exe run -e master_uno -t upload
    • NU deschide încă Serial Monitor
 
 3. Pornire sistem complet:
    • Conectează ambele Arduino-uri la USB (alimentare)
    • Deschide Serial Monitor pentru MASTER (9600 baud)
    • Trebuie să vezi: "MASTER: Pachet I2C valid primit"
+
+═══════════════════════════════════════════════════════════════════════════════
+  REZUMAT FINAL - TOATE CONEXIUNILE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ARDUINO MEGA 2560 - SLAVE (cu HC-SR04 și FreeRTOS)                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Pin 8     → HC-SR04 TRIG
+  Pin 9     → HC-SR04 ECHO
+  Pin 20    → Arduino Uno Pin A4 (SDA) + Rezistență 4.7kΩ la 5V
+  Pin 21    → Arduino Uno Pin A5 (SCL) + Rezistență 4.7kΩ la 5V
+  5V        → Rail pozitiv breadboard [+]
+  GND       → Rail negativ breadboard [-] (COMUN cu Uno!)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ARDUINO UNO - MASTER (interogare I²C și afișare)                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Pin A4    → Arduino Mega Pin 20 (SDA) + Rezistență 4.7kΩ la 5V
+  Pin A5    → Arduino Mega Pin 21 (SCL) + Rezistență 4.7kΩ la 5V
+  GND       → Rail negativ breadboard [-] (COMUN cu Mega!)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  HC-SR04 - Senzor Ultrasonic                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  VCC       → Rail pozitiv breadboard [+]
+  TRIG      → Arduino Mega Pin 8
+  ECHO      → Arduino Mega Pin 9
+  GND       → Rail negativ breadboard [-]
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  REZISTENȚE PULL-UP (4.7kΩ)                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Rezistență 1: între linia SDA și rail pozitiv [+] (5V)
+  Rezistență 2: între linia SCL și rail pozitiv [+] (5V)
 
 ═══════════════════════════════════════════════════════════════════════════════
 
